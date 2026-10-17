@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 TELEGRAM_TOKEN = "8746800192:AAFvVoTte-9hXipJavPnpI3nCAM2bsqaPiE"
 # کلید واقعی جمنای خود را در خط زیر جایگزین کنید
-GEMINI_API_KEY = "AQ.Ab8RN6JmLd9ET0m2PUYudTu3-aM8ChAt9O1voZotn8lAWWbfrg"
+GEMINI_API_KEY = "AQ.Ab8RN6L-MseJmNRPCojeruDlt7qi5S6cHoqVM_EGO8LGmmyrng"
 APP_URL = "https://malibot2.vercel.app"
 
 GAME_HTML = """<!DOCTYPE html>
