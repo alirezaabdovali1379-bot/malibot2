@@ -1,5 +1,4 @@
 from flask import Flask, request
-from google import genai
 import requests
 
 app = Flask(__name__)
@@ -20,15 +19,14 @@ def webhook():
             user_text = data["message"].get("text", "")
             
             if user_text:
-                try:
-                    client = genai.Client(api_key=GEMINI_API_KEY)
-                    response = client.models.generate_content(
-                        model='gemini-3.8-flash',
-                        contents=user_text,
-                    )
-                    reply_text = response.text
-                except Exception as e:
-                    reply_text = f"خطای جمنای: {str(e)}"
+                gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={GEMINI_API_KEY}"
+                payload = {"contents": [{"parts": [{"text": user_text}]}]}
+                
+                res = requests.post(gemini_url, json=payload)
+                if res.status_code == 200:
+                    reply_text = res.json()["candidates"][0]["content"]["parts"][0]["text"]
+                else:
+                    reply_text = f"خطای جمنای: {res.text}"
                 
                 requests.post(
                     f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
