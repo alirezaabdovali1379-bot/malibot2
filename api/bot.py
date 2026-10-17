@@ -4,7 +4,7 @@ import requests
 app = Flask(__name__)
 
 TELEGRAM_TOKEN = "8746800192:AAFvVoTte-9hXipJavPnpI3nCAM2bsqaPiE"
-GEMINI_API_KEY = "AQ.Ab8RN6IEWdKPYhka8YOXsDYfFX0r1So4J7bJtYeilT0jA8iEew"  # کلید جمنای خودت رو اینجا بذار
+GEMINI_API_KEY = "AQ.Ab8RN6JmLd9ET0m2PUYudTu3-aM8ChAt9O1voZotn8lAWWbfrg"  # کلید جمنای خودت رو اینجا بذار
 
 @app.route('/', methods=['GET'])
 def home():
