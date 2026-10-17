@@ -1,40 +1,46 @@
-from flask import Flask, request
+import os
+from telegram import Update
+from telegram.ext import ApplicationBuilder, MessageHandler, ContextTypes, filters
 from google import genai
-import requests
 
-app = Flask(name)
-
+# تنظیمات کلیدها (بهتر است متغیرهای محیطی باشند یا به صورت مستقیم وارد کنید)
 TELEGRAM_TOKEN = "8746800192:AAFvVoTte-9hXipJavPnpI3nCAM2bsqaPiE"
-GEMINI_API_KEY = "AQ.Ab8RN6IEWdKPYhka8YOXsDYfFX0r1So4J7bJtYeilT0jA8iEew"  # کلید جمنای خودت رو اینجا بذار
+GEMINI_API_KEY = "AQ.Ab8RN6IEWdKPYhka8YOXsDYfFX0r1So4J7bJtYeilT0jA8iEew"
 
-@app.route('/', methods=['GET'])
-def home():
-    return "Telegram Bot is running on Vercel!"
+# راه‌اندازی کلاینت جمنای
+client = genai.Client(api_key=GEMINI_API_KEY)
 
-@app.route('/', methods=['POST'])
-def webhook():
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_message = update.message.text
+    chat_id = update.message.chat_id
+    
+    # ارسال پیام وضعیت «در حال تایپ...» به کاربر
+    await context.bot.send_chat_action(chat_id=chat_id, action="typing")
+    
     try:
-        data = request.get_json(force=True)
-        if data and "message" in data:
-            chat_id = data["message"]["chat"]["id"]
-            user_text = data["message"].get("text", "")
-            
-            if user_text:
-                try:
-                    client = genai.Client(api_key=GEMINI_API_KEY)
-                    response = client.models.generate_content(
-                        model='gemini-3.8-flash',
-                        contents=user_text,
-                    )
-                    reply_text = response.text
-                except Exception as e:
-                    reply_text = f"خطای جمنای: {str(e)}"
-                
-                requests.post(
-                    f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
-                    json={"chat_id": chat_id, "text": reply_text}
-                )
+        # ارسال پیام به مدل جمنای (استفاده از مدل استاندارد gemini-3.8-flash-lite یا نسخه دلخواه)
+        response = client.models.generate_content(
+            model='gemini-3.8-flash',
+            contents=user_message,
+        )
+        reply_text = response.text
     except Exception as e:
+        reply_text = "متأسفانه در ارتباط با هوش مصنوعی خطایی رخ داد."
         print(f"Error: {e}")
         
-    return "OK", 200
+    # ارسال پاسخ جمنای به کاربر در تلگرام
+    await update.message.reply_text(reply_text)
+
+def main():
+    # ساخت اپلیکیشن ربات تلگرام
+    app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
+    
+    # افزودن هندلر برای دریافت تمام پیام‌های متنی
+    app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_message))
+    
+    print("ربات در حال اجراست...")
+    # شروع به کار ربات (Polling)
+    app.run_polling()
+
+if __name__ == '__main__':
+    main()
