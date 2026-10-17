@@ -951,8 +951,9 @@ def webhook():
                 )
                 return "OK", 200
 
-            if user_text:
-                gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key={GEMINI_API_KEY}"
+          
+  if user_text:
+                gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={GEMINI_API_KEY}"
                 payload = {"contents": [{"parts": [{"text": user_text}]}]}
                 
                 res = requests.post(gemini_url, json=payload)
@@ -969,3 +970,5 @@ def webhook():
         print(f"Error: {e}")
         
     return "OK", 200
+        
+ 
